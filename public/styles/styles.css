@@ -1,11 +1,101 @@
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+}
+
+.line-through{
+    text-decoration: line-through;
+}
+
+h1 {
+    font-weight: 100;
+    font-size: 2em;
+    padding: 8px 18px;
+    color: #fff;    
+    background: linear-gradient(to right, rgb(190, 38, 122), rgb(102, 0, 128) 60%)
+}
+
+#addBtn {
+    border: none;
+    transform: scaleX(-1);
+    color: rgb(74, 74, 228);
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 600px;
+    justify-items: center;
+    width: 360px;
+}
+
+form {
+    margin: 20px 0;
+}
+
+.content{
+    margin: 0;
+    padding: 0;
+}
+
+
+#todo-input {
+    width: 296px;
+    height: 22px;
+    background-color: rgba(240, 240, 240, 0.6);
+
+    border-image: linear-gradient(to left, #743ad5 0%, #d53a9d 100%);
+    border-image-slice: 1;
+    border-width: 1px;
+}
+.list{
+    border-top: 1px solid rgba(240, 240, 240, 0.6);
+    width: 105%;
+    font-weight: bold;
+}
+
+.holder {
+    display: flex;
+    align-items: center;
+    background: rgba(240, 240, 240, 0.6);
+    padding: 3px 8px;
+    border-radius: 5px;
+    margin: 18px 0;
+}
+
+
 li {
     list-style: none;
+    align-self: center;
+    margin-left:5px;
 }
 
 .fa-square, .fa-times {
     cursor: pointer;
 }
 
-.line-through{
-    text-decoration: line-through;
+.fa-times {
+    margin-left: auto;
+    color: rgb(74, 74, 228);
+}
+
+@media only screen and (min-width: 768px){
+    .container {        
+        border: 1px solid #8f1d5c;
+        margin-top: 40px;
+        width: 720px;
+        border-radius: 5px;
+        height: auto;
+    }
+
+    #todo-input {
+        width: 598px;
+    }
+
+    .list {
+        width: 91%;
+    }
 }

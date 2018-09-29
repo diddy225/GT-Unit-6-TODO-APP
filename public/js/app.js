@@ -1,30 +1,31 @@
-$(function(){
-    let num = -1;
+$(function () {
+
+    //*******RENDER ALL ITEMS TO PAGE********
     const render = function () {
         $('.content').empty();
+        $.ajax({ url: '/api/list', method: 'GET' })
+            .then(function (dataList) {
+                let htmlstr = '';
+                dataList.forEach(element => {
+                    htmlstr += `<div class="holder">`
+                    htmlstr += `<input type="checkbox" id="${element.id}" class="checkbox far fa-square"/>`
+                    htmlstr += `<li class="item">${element.todo}</li>`
+                    htmlstr += `<i id="${element.id}" class="fas fa-times"></i></div>`
+                })
+                $('.content').html(htmlstr);
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
+    };
 
-            $.ajax({url: '/api/list', method: 'GET'})
-                    .then(function(dataList){
-                        let htmlstr = '';
-                        dataList.forEach(element => {
-                            htmlstr += `    <div class="row">
-                                                <li class="col-6"><i id="${num}" class="col- far fa-square edit"></i>  ${element.todo}</li>
-                                                <i class="col- fas fa-times"></i>
-                                            </div>`;
-                        })
 
-                        $('.content').html(htmlstr);
-                    })
-                    .catch(function(err){
-                        console.log(err);
-                    })
-    }
-
-    $('#addBtn').on('click', function (event) {
-        event.preventDefault();
+    //****ADD A NEW ITEM*****
+    $('#addBtn').on('click', function (e) {
+        e.preventDefault();
         const item = {
-            id: num = num + 1,
-            todo: $('#todo-item').val().trim(),
+            id: 0,
+            todo: $('#todo-input').val().trim(),
             completed: false
         };
 
@@ -34,46 +35,71 @@ $(function(){
                 return;
             }
         }
-            $.ajax({url: '/api/list', method: 'POST', data: JSON.stringify(item), contentType: "application/json"})
-                .then(function(data){
-                    if(data.todo){
-                        $('#todo-item').val('');
-                        $('#todo-item').focus('');
-                        render();
-                    }
-                    else {
-                        alert('Cats in the server room again!');
-                    }
-                })
-                .catch(function(err){
-                    console.log(err);
-                })
-        });
-
-        
-    
-    $(this).on('click', '.edit', function (event) {
-        let number = $(this).attr('id');
-
-        const item = {
-            id: number,
-            todo: $('#todo-item').val().trim(),
-            completed: false
-        };
-
-        console.log(item);
-
-        $.ajax({url: `/api/list/${number}`, method: 'PUT', data: JSON.stringify(item), contentType: "application/json"})
-            .then(function(data){
-                console.log(data);
-                $(this).addClass('line-through');
-                render()
+        $.ajax({ url: '/api/list/items', method: 'POST', data: JSON.stringify(item), contentType: "application/json" })
+            .then(function (data) {
+                if (data.todo) {
+                    $('#todo-input').val('');
+                    $('#todo-input').focus('');
+                    render();
+                }
+                else {
+                    alert('Cats in the server room again!');
+                }
             })
-            .catch(function(err){
+            .catch(function (err) {
                 console.log(err);
             });
-
-
     });
+    //*****UPDATE ITEM THAT IS COMPLETED BY CHECKING THE BOX, AND SETTING COMPLETED TO TRUE OR FALSE******
+    $(this).on('change', 'input:checkbox', function (event) {
+        event.preventDefault()
+        const id = $(this).prop('id');
+
+        if ($(this).prop('checked')) {
+            $(this).siblings('li').addClass('line-through'); /*<----THIS GETS THE LIST ITEM TEXT AND CROSSES IT OUT*/
+            const completed = {
+                id: parseFloat(id),
+                completed: true
+            }
+            //---->SEND TRUE TO API
+            $.ajax({ url: `/api/list/`, method: 'PUT', data: JSON.stringify(completed), contentType: "application/json" })
+                .then(function () {
+
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+        }
+        else if (!$(this).prop('checked')) {
+            $(this).siblings('li').removeClass('line-through');/*<----THIS GETS THE LIST ITEM TEXT AND CROSSES IT OUT*/
+            const completed = {
+                id: parseFloat(id),
+                completed: false
+            }
+            //----->SEND FALSE TO API
+            $.ajax({ url: `/api/list/`, method: 'PUT', data: JSON.stringify(completed), contentType: "application/json" })
+                .then(function () {
+
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+        };
+    })
+
+    $(this).on('click', '.fa-times', function (event) {
+        event.preventDefault()
+        let id = $(this).prop('id');
+
+        $.ajax({url: `/api/list/${id}`, method: 'DELETE'})
+        .then(function(){
+            
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+        render();
+    });
+
     render();
 });
