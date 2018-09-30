@@ -100,3 +100,4 @@ $('.content').on('click', '.fa-times', function () {
             console.log(err);
         })
 });
+gitList();
