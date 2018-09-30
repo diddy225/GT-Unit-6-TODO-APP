@@ -1,105 +1,102 @@
-$(function () {
+//*******RENDER FUNCTINON********
+const render = function (htmlStr) {
+    $('.content').html(htmlStr);
+};
 
-    //*******RENDER ALL ITEMS TO PAGE********
-    const render = function () {
-        $('.content').empty();
-        $.ajax({ url: '/api/list', method: 'GET' })
-            .then(function (dataList) {
-                let htmlstr = '';
-                dataList.forEach(element => {
-                    htmlstr += `<div class="holder">`
-                    htmlstr += `<input type="checkbox" id="${element.id}" class="checkbox far fa-square"/>`
-                    htmlstr += `<li class="item">${element.todo}</li>`
-                    htmlstr += `<i id="${element.id}" class="fas fa-times"></i></div>`
-                })
-                $('.content').html(htmlstr);
+//GET ALL LIST ITEMS FROM API
+const getList = function () {
+    let listItem = '';
+
+    $.ajax({ url: '/api/list', method: 'GET' })
+        .then(function (data) {
+            data.forEach(e => {
+                listItem += `<div class="holder">`
+                listItem += `<i  id="${e.id}" class="check far fa-square"></i>`
+                listItem += `<li class="item">${e.todo}</li>`
+                listItem += `<i id="${e.id}" class="fas fa-times"></i></div>`
             })
-            .catch(function (err) {
-                console.log(err);
-            });
+            render(listItem);
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+}
+
+//****ADD A NEW ITEM*****
+$('#addBtn').on('click', function (e) {
+    e.preventDefault();
+    const addItem = {
+        id: 0,
+        todo: $('#todo-input').val().trim(),
+        completed: false
     };
 
-
-    //****ADD A NEW ITEM*****
-    $('#addBtn').on('click', function (e) {
-        e.preventDefault();
-        const item = {
-            id: 0,
-            todo: $('#todo-input').val().trim(),
-            completed: false
-        };
-
-        for (let todo in item) {
-            if (item[todo] === '') {
-                alert('Please fill out all fields');
-                return;
-            }
+    //VALIDATE BOX IS FILLED OUT
+    for (let todo in addItem) {
+        if (addItem[todo] === '') {
+            alert('Please fill out all fields');
+            return
         }
-        $.ajax({ url: '/api/list/items', method: 'POST', data: JSON.stringify(item), contentType: "application/json" })
+    }
+    $.ajax({ url: '/api/list/items', method: 'POST', data: JSON.stringify(addItem), contentType: "application/json" })
+        .then(function (data) {
+            if (data) {
+                $('#todo-input').val('');
+                $('#todo-input').focus('');
+                getList();
+            }
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+});
+
+//*****UPDATE ITEM THAT IS COMPLETED BY CHECKING THE BOX, AND SETTING COMPLETED TO TRUE OR FALSE******
+$('.content').on('click', '.check', function(){
+    let elementClass = $(this).prop('class');
+    let id = $(this).prop('id');
+    const complete = {
+        id: parseFloat(id),
+        completed: true
+    };
+    const notComplete = {
+        id: parseFloat(id),
+        completed: false
+    };
+    if(elementClass === 'check far fa-square'){
+        $(this).prop('class', 'check fas fa-check-square');
+        $(this).siblings('li').addClass('line-through');
+
+        $.ajax({ url: `/api/list/${id}`, method: 'PUT', data: JSON.stringify(complete), contentType: "application/json" })
+        .then(function (data) {
+            if (data) {    
+
+            }
+        })
+        .catch(function (err) {
+            console.log(err);
+        });
+    } 
+    else{
+        $(this).prop('class', 'check far fa-square')
+        $(this).siblings('li').removeClass('line-through');
+        $.ajax({ url: `/api/list/${id}`, method: 'PUT', data: JSON.stringify(notComplete), contentType: "application/json" })
             .then(function (data) {
-                if (data.todo) {
-                    $('#todo-input').val('');
-                    $('#todo-input').focus('');
-                    render();
-                }
-                else {
-                    alert('Cats in the server room again!');
-                }
+
             })
             .catch(function (err) {
                 console.log(err);
             });
-    });
-    //*****UPDATE ITEM THAT IS COMPLETED BY CHECKING THE BOX, AND SETTING COMPLETED TO TRUE OR FALSE******
-    $(this).on('change', 'input:checkbox', function (event) {
-        event.preventDefault()
-        const id = $(this).prop('id');
-
-        if ($(this).prop('checked')) {
-            $(this).siblings('li').addClass('line-through'); /*<----THIS GETS THE LIST ITEM TEXT AND CROSSES IT OUT*/
-            const completed = {
-                id: parseFloat(id),
-                completed: true
-            }
-            //---->SEND TRUE TO API
-            $.ajax({ url: `/api/list/`, method: 'PUT', data: JSON.stringify(completed), contentType: "application/json" })
-                .then(function () {
-
-                })
-                .catch(function (err) {
-                    console.log(err);
-                });
-        }
-        else if (!$(this).prop('checked')) {
-            $(this).siblings('li').removeClass('line-through');/*<----THIS GETS THE LIST ITEM TEXT AND CROSSES IT OUT*/
-            const completed = {
-                id: parseFloat(id),
-                completed: false
-            }
-            //----->SEND FALSE TO API
-            $.ajax({ url: `/api/list/`, method: 'PUT', data: JSON.stringify(completed), contentType: "application/json" })
-                .then(function () {
-
-                })
-                .catch(function (err) {
-                    console.log(err);
-                });
-        };
-    })
-
-    $(this).on('click', '.fa-times', function (event) {
-        event.preventDefault()
-        let id = $(this).prop('id');
-
-        $.ajax({url: `/api/list/${id}`, method: 'DELETE'})
-        .then(function(){
-            
+    }
+})
+//DELETE
+$('.content').on('click', '.fa-times', function () {
+    let id = $(this).prop('id');
+    $.ajax({ url: `/api/list/${id}`, method: 'DELETE' })
+        .then(function (data) {
+            getList();
         })
-        .catch(function(err){
+        .catch(function (err) {
             console.log(err);
         })
-        render();
-    });
-
-    render();
 });

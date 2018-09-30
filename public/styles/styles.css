@@ -20,7 +20,6 @@ h1 {
 
 #addBtn {
     border: none;
-    transform: scaleX(-1);
     color: rgb(74, 74, 228);
 }
 
@@ -55,6 +54,7 @@ form {
     border-top: 1px solid rgba(240, 240, 240, 0.6);
     width: 105%;
     font-weight: bold;
+    overflow: auto;
 }
 
 .holder {
@@ -73,7 +73,7 @@ li {
     margin-left:5px;
 }
 
-.fa-square, .fa-times {
+.fa-square, .fa-times , .fa-check-square{
     cursor: pointer;
 }
 
