@@ -64,7 +64,7 @@ $('.content').on('click', '.check', function(){
     };
     if(elementClass === 'check far fa-square'){
         $(this).prop('class', 'check fas fa-check-square');
-        //$(this).siblings('li').addClass('line-through');
+        $(this).siblings('li').addClass('line-through');
 
         $.ajax({url:`/api/list/${id}`, method: 'PUT', data: JSON.stringify(complete), contentType: "application/json"})
         .then(function (data) {
@@ -76,7 +76,7 @@ $('.content').on('click', '.check', function(){
     } 
     else{
         $(this).prop('class', 'check far fa-square')
-        //$(this).siblings('li').removeClass('line-through');
+        $(this).siblings('li').removeClass('line-through');
 
         $.ajax({ url: `/api/list/${id}`, method: 'PUT', data: JSON.stringify(notComplete), contentType: "application/json"})
             .then(function (data) {
