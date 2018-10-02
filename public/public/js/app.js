@@ -7,13 +7,13 @@ const render = function (htmlStr) {
 const getList = function () {
     let listItem = '';
 
-    $.ajax({ url: '/api/list', method: 'GET' })
+    $.ajax({ url:'/api/list', method: 'GET' })
         .then(function (data) {
             data.forEach(e => {
-                listItem += `<div class="holder">`
-                listItem += `<i  id="${e.id}" class="check far fa-square"></i>`
-                listItem += `<li class="item">${e.todo}</li>`
-                listItem += `<i id="${e.id}" class="fas fa-times"></i></div>`
+                listItem += `<article class="holder">`
+                listItem += `<i  id="${e._id}" class="check far fa-square"></i>`
+                listItem += `<li class="item">${e.item}</li>`
+                listItem += `<i id="${e._id}" class="fas fa-times"></i></article>`
             })
             render(listItem);
         })
@@ -26,8 +26,7 @@ const getList = function () {
 $('#addBtn').on('click', function (e) {
     e.preventDefault();
     const addItem = {
-        id: 0,
-        todo: $('#todo-input').val().trim(),
+        item: $('#todo-input').val().trim(),
         completed: false
     };
 
@@ -38,7 +37,7 @@ $('#addBtn').on('click', function (e) {
             return
         }
     }
-    $.ajax({ url: '/api/list/items', method: 'POST', data: JSON.stringify(addItem), contentType: "application/json" })
+    $.ajax({url:'/api/list', method: 'POST', data: addItem})
         .then(function (data) {
             if (data) {
                 $('#todo-input').val('');
@@ -54,24 +53,22 @@ $('#addBtn').on('click', function (e) {
 //*****UPDATE ITEM THAT IS COMPLETED BY CHECKING THE BOX, AND SETTING COMPLETED TO TRUE OR FALSE******
 $('.content').on('click', '.check', function(){
     let elementClass = $(this).prop('class');
+    const listItem = $(this).siblings('li');
     let id = $(this).prop('id');
+
     const complete = {
-        id: parseFloat(id),
         completed: true
     };
     const notComplete = {
-        id: parseFloat(id),
         completed: false
     };
     if(elementClass === 'check far fa-square'){
         $(this).prop('class', 'check fas fa-check-square');
-        $(this).siblings('li').addClass('line-through');
+        //$(this).siblings('li').addClass('line-through');
 
-        $.ajax({ url: `/api/list/${id}`, method: 'PUT', data: JSON.stringify(complete), contentType: "application/json" })
+        $.ajax({url:`/api/list/${id}`, method: 'PUT', data: JSON.stringify(complete), contentType: "application/json"})
         .then(function (data) {
-            if (data) {    
 
-            }
         })
         .catch(function (err) {
             console.log(err);
@@ -79,8 +76,9 @@ $('.content').on('click', '.check', function(){
     } 
     else{
         $(this).prop('class', 'check far fa-square')
-        $(this).siblings('li').removeClass('line-through');
-        $.ajax({ url: `/api/list/${id}`, method: 'PUT', data: JSON.stringify(notComplete), contentType: "application/json" })
+        //$(this).siblings('li').removeClass('line-through');
+
+        $.ajax({ url: `/api/list/${id}`, method: 'PUT', data: JSON.stringify(notComplete), contentType: "application/json"})
             .then(function (data) {
 
             })
@@ -92,9 +90,10 @@ $('.content').on('click', '.check', function(){
 //DELETE
 $('.content').on('click', '.fa-times', function () {
     let id = $(this).prop('id');
-    $.ajax({ url: `/api/list/${id}`, method: 'DELETE' })
+
+    $.ajax({ url:`/api/list/${id}`, method: 'DELETE' })
         .then(function (data) {
-            getList();
+            render(getList());
         })
         .catch(function (err) {
             console.log(err);

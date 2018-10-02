@@ -1,42 +1,70 @@
-let list = require('../data/list.js');
+const db = require("../models");
 
 module.exports = function(app){
-
+    
     app.get('/api/list', function(req, res){
-        res.json(list);
+        db.Todolist.find({})
+            .then(function(data){
+                res.json(data)
+            })
+            .catch(function(err){
+                console.log(err);
+            })
     });
 
-    app.post('/api/list/items', function(req, res){
-        let id = list.length;
-
-        list.push(req.body)
-        req.body.id = id;
-        res.json(list);
+    app.post('/api/list', function(req, res){
+        db.Todolist.create(req.body)
+            .then(function(data){
+                res.json(data);
+            })
+            .catch(function(err){
+                res.json(err);
+            })
+        
     });
 
-    app.get('/api/list/:index', function(req, res){
-        res.json(list[req.params.index]);
+    app.get('/api/list/:id', function(req, res){
+        let chosen = req.params.id;
+        db.Todolist.find({"_id":chosen})
+        .then(function(data){
+            res.json(data)
+        })
+        .catch(function(err){
+            console.log(err);
+        })
     });
 
     app.put('/api/list/:id', function(req, res){
-        if(req.body.completed && req.params.id === req.body.id){
-            list[req.body.id].completed = req.body.completed;
-            res.json(req.body.completed);
+        let chosen = req.params.id;
+
+        if(req.body.completed){
+            db.Todolist.findOneAndUpdate({"_id":chosen}, {$set: {completed: false}})
+                .then(function(data){
+                    res.json(data)
+                })
+                .catch(function(err){
+                    console.log(err);
+                })
         }
-        else if (!req.body.completed && req.params.id === req.body.id){
-            list[req.body.id].completed = req.body.completed;
-            res.json(req.body.completed);
-        }
-        res.send('success');
+        else{
+            db.Todolist.findOneAndUpdate({"_id":chosen}, {$set: {completed: true}})
+                .then(function(data){
+                    res.json(data)
+                })
+                .catch(function(err){
+                    console.log(err);
+                })
+        }       
     });
 
     app.delete('/api/list/:id', function(req, res){
         let chosen = req.params.id;
-        const index = list.findIndex(e => parseFloat(e.id) === parseFloat(chosen));
-
-        if(index != -1){
-            list.splice(index, 1);
-        }
-        res.json({success:"success"})
-    })
+        db.Todolist.findOneAndDelete({"_id": chosen})
+            .then(function(data){
+                res.json({"success": true})
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+    })  
 }
