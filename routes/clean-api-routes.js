@@ -7,6 +7,6 @@ module.exports = function (app) {
   task.findAll();
   task.find('id');
   task.create();
-  task.taskComplete('id');
+  task.taskComplete('id', app, db.ToDolist);
   task.delete('id');
 }

@@ -38,18 +38,18 @@ module.exports = function(app){
         let chosen = req.params.id;
 
         if(req.body.completed){
-            db.Todolist.findOneAndUpdate({"_id":chosen}, {$set: {completed: false}})
+            db.Todolist.findOneAndUpdate({"_id":chosen}, {$set: {completed: req.body.completed}})
                 .then(function(data){
-                    res.json(data)
+                    res.json(req.body.completed)
                 })
                 .catch(function(err){
                     console.log(err);
                 })
         }
         else{
-            db.Todolist.findOneAndUpdate({"_id":chosen}, {$set: {completed: true}})
+            db.Todolist.findOneAndUpdate({"_id":chosen}, {$set: {completed: false}})
                 .then(function(data){
-                    res.json(data)
+                    res.json(data.completed)
                 })
                 .catch(function(err){
                     console.log(err);

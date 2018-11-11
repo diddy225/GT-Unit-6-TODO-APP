@@ -6,7 +6,7 @@ input:focus, textarea:focus {
     outline: none;
 }
 
-.line-through{
+.line-through {
     text-decoration: line-through;
 }
 
@@ -66,11 +66,33 @@ form {
     margin: 18px 0;
 }
 
+input[type=checkbox] {
+    display: none;
+}
 
-li {
-    list-style: none;
-    align-self: center;
-    margin-left:5px;
+label {
+    margin-bottom: 0;
+}
+
+input[type=checkbox] + label:before {
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    letter-spacing: 10px;
+    -webkit-font-smoothing: antialiased;
+}
+
+input[type=checkbox] + label:before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 400;
+    content: "\f0c8";
+}
+
+input[type=checkbox]:checked + label:before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 400;
+    content: "\f14a";
 }
 
 .fa-square, .fa-times , .fa-check-square{
