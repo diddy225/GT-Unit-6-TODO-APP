@@ -1,29 +1,3 @@
-//*******RENDER FUNCTINON********
-const render = function (htmlStr) {
-    $('.content').empty();
-    $('.content').append(htmlStr);
-};
-
-
-//GET ALL LIST ITEMS FROM API
-const getList = function () {
-    $('.content').empty();
-    let listItem = '';
-    $.ajax({ url:'/api/list', method: 'GET' })
-        .then(function (data) {
-            data.forEach(e => {
-                listItem += `<article class="holder">`
-                listItem += `<input class="checkbox" id="${e._id}" type="checkbox">`
-                listItem += `<label for="${e._id}">${e.item}</label>`
-                listItem += `<i id="${e._id}" class="fas fa-times"></i></article>`
-            })
-            render(listItem);
-        })
-        .catch(function (err) {
-            console.log(err);
-        });
-}
-
 //****ADD A NEW ITEM*****
 $('#addBtn').on('click', function (e) {
     e.preventDefault();
@@ -38,16 +12,16 @@ $('#addBtn').on('click', function (e) {
         }
     }
     $.ajax({url:'/api/list', method: 'POST', data: addItem})
-        .then(function (data) {
+        .then(function (data) { 
             if (data) {
                 $('#todo-input').val('');
                 $('#todo-input').focus('');
+                getList();
             }
         })
         .catch(function (err) {
             console.log(err);
         });
-        getList();
 });
 
 //*****UPDATE ITEM THAT IS COMPLETED BY CHECKING THE BOX, AND SETTING COMPLETED TO TRUE OR FALSE******
@@ -59,6 +33,25 @@ $('.content').on('click', '.checkbox', function(){
      }
 })
 
+//GET ALL LIST ITEMS FROM API
+const getList = function () {
+    $('.content').empty();
+    let listItem = '';
+    $.ajax({ url:'/api/list', method: 'GET' })
+        .then(function (data) {
+            data.forEach((e) => {
+            listItem += `<article class="holder">`
+            listItem += `<input class="checkbox" id="${e._id}" type="checkbox">`
+            listItem += `<label for="${e._id}">${e.item}</label>`
+            listItem += `<i id="${e._id}" class="fas fa-times"></i></article>`
+        })
+        $('.content').append(listItem);
+    })
+        .catch(function (err) {
+            console.log(err);
+        });
+}
+getList();
 
 //DELETE
 $('.content').on('click', '.fa-times', function () {
@@ -66,7 +59,7 @@ $('.content').on('click', '.fa-times', function () {
 
     $.ajax({ url:`/api/list/${id}`, method: 'DELETE' })
         .then(function (data) {
-            render(getList());
+            getList();
         })
         .catch(function (err) {
             console.log(err);
